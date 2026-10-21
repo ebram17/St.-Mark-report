@@ -3,90 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المشرفين</title>
-    <!-- روابط التصميم والـ Supabase -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>إضافة مشرف جديد</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Tahoma, sans-serif; background-color: #f4f7f6; padding: 20px; direction: rtl; text-align: right; }
+        .container { max-width: 500px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: auto; }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #007bff; color: #fff; border: none; padding: 10px 15px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
 </head>
-<body class="bg-light py-5">
-    <div class="container">
-        <div class="card shadow p-4 mx-auto" style="max-width: 600px;">
-            <h3 class="mb-4 text-center">إضافة مشرف جديد</h3>
-            
-            <!-- تنبيه توضيحي -->
-            <div class="alert alert-info py-2" style="font-size: 14px;">
-                أدخل بيانات المشرف الأساسية أدناه. سيتم إنشاء الحساب وربطه تلقائياً.
-            </div>
+<body>
 
-            <form id="supervisorForm">
-                <!-- تم إلغاء خانة الـ UUID تماماً بناءً على طلبك -->
-
-                <div class="mb-3">
-                    <label class="form-label">الاسم</label>
-                    <input type="text" id="fullNameInput" class="form-control" required placeholder="أدخل اسم المشرف">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">البريد الإلكتروني</label>
-                    <input type="email" id="emailInput" class="form-control" required placeholder="example@domain.com">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">الفرع</label>
-                    <select id="branchSelect" class="form-select">
-                        <option value="الخطاطبة">الخطاطبة</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">القسم</label>
-                    <select id="departmentSelect" class="form-select">
-                        <option value="مشرف مطعم">مشرف مطعم</option>
-                        <option value="هاوس كيبنج">هاوس كيبنج</option>
-                        <option value="نائب المدير">نائب المدير</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100">حفظ المشرف</button>
-            </form>
-        </div>
+<div class="container">
+    <h2>إضافة مشرف جديد</h2>
+    <div class="form-group">
+        <label>الاسم</label>
+        <input type="text" id="fullNameInput" placeholder="أدخل اسم المشرف">
+    </div>
+    
+    <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="emailInput" placeholder="example@domain.com">
     </div>
 
-    <!-- كود الجافاسكريبت المحدث والمربوط -->
-    <script>
-        // إعداد اتصال Supabase (استبدل بالبيانات الخاصة بك إذا لزم الأمر)
-        const supabaseUrl = 'YOUR_SUPABASE_URL';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    <div class="form-group">
+        <label>الفرع</label>
+        <select id="branchSelect">
+            <option value="الخطاطبة">الخطاطبة</option>
+        </select>
+    </div>
 
-        document.getElementById('supervisorForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const fullName = document.getElementById('fullNameInput').value.trim();
-            const email = document.getElementById('emailInput').value.trim();
-            const branch = document.getElementById('branchSelect').value;
-            const department = document.getElementById('departmentSelect').value;
+    <div class="form-group">
+        <label>القسم</label>
+        <select id="departmentSelect">
+            <option value="مشرف مطعم">مشرف مطعم</option>
+            <option value="هاوس كيبنج">هاوس كيبنج</option>
+            <option value="نائب المدير">نائب المدير</option>
+        </select>
+    </div>
 
-            try {
-                // تحديث بيانات المشرف في جدول الـ profiles بالاعتماد على الإيميل
-                const { data, error } = await supabaseClient
-                    .from('profiles')
-                    .update({ 
-                        full_name: fullName, 
-                        branch: branch, 
-                        department: department,
-                        role: 'supervisor' 
-                    })
-                    .eq('email', email);
+    <button onclick="saveSupervisor()">حفظ المشرف</button>
+</div>
 
-                if (error) throw error;
-
-                alert('تم حفظ بيانات المشرف بنجاح!');
-                document.getElementById('supervisorForm').reset();
-            } catch (error) {
-                alert('حدث خطأ أثناء الحفظ: ' + error.message);
-            }
-        });
-    </script>
+<!-- استدعاء ملف الجافاسكريبت الخارجي -->
+<script src="js.js"></script>
 </body>
 </html>
