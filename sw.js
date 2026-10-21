@@ -1,4 +1,8 @@
-// دالة حفظ المشرف الجديدة بدون الحاجة للـ UUID اليدوي
+// إعداد اتصال Supabase (تأكد من وضع بياناتك الصحيحة هنا)
+const SUPABASE_URL = 'ضع_رابط_السูปابيس_هنا';
+const SUPABASE_KEY = 'ضع_مفتاح_الـ_anon_key_هنا';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 async function saveSupervisor() {
     const fullName = document.getElementById('fullNameInput').value.trim();
     const email = document.getElementById('emailInput').value.trim();
@@ -11,7 +15,7 @@ async function saveSupervisor() {
     }
 
     try {
-        // البحث عن المستخدم في جدول الـ profiles أو ربطه بالبريد الإلكتروني مباشرة
+        // تحديث بيانات المشرف بالاعتماد على الإيميل مباشرة من غير UUID يدوي
         const { data, error } = await supabaseClient
             .from('profiles')
             .update({ 
@@ -24,8 +28,12 @@ async function saveSupervisor() {
 
         if (error) throw error;
 
-        alert('تم حفظ بيانات المشرف بنجاح!');
-        // إعادة تحميل أو تفريغ الحقول حسب الحاجة
+        alert('تم حفظ وتحديث بيانات المشرف بنجاح!');
+        
+        // تفريغ الحقول بعد الحفظ الناجح
+        document.getElementById('fullNameInput').value = '';
+        document.getElementById('emailInput').value = '';
+
     } catch (error) {
         alert('حدث خطأ أثناء الحفظ: ' + error.message);
     }
