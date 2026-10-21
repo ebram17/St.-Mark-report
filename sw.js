@@ -1,42 +1,32 @@
-// St. Mark Report Service Worker
-const CACHE_NAME = 'st-mark-report-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icon.svg'
-];
+// دالة حفظ المشرف الجديدة بدون الحاجة للـ UUID اليدوي
+async function saveSupervisor() {
+    const fullName = document.getElementById('fullNameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const branch = document.getElementById('branchSelect').value;
+    const department = document.getElementById('departmentSelect').value;
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
-  self.skipWaiting();
-});
+    if (!fullName || !email) {
+        alert('من فضلك ادخل الاسم والبريد الإلكتروني على الأقل');
+        return;
+    }
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
-});
+    try {
+        // البحث عن المستخدم في جدول الـ profiles أو ربطه بالبريد الإلكتروني مباشرة
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .update({ 
+                full_name: fullName, 
+                branch: branch, 
+                department: department,
+                role: 'supervisor' 
+            })
+            .eq('email', email);
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => {
-        // Fallback or offline handling if needed
-      });
-    })
-  );
-});
+        if (error) throw error;
+
+        alert('تم حفظ بيانات المشرف بنجاح!');
+        // إعادة تحميل أو تفريغ الحقول حسب الحاجة
+    } catch (error) {
+        alert('حدث خطأ أثناء الحفظ: ' + error.message);
+    }
+}
